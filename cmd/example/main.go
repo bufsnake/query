@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/bufsnake/query"
 	"log"
-	"reflect"
 )
 
 type User struct {
@@ -32,9 +31,8 @@ func main() {
 	fmt.Println("   SQL:", sql)
 	fmt.Println("PARAMS:", params)
 	fmt.Println("FORMAT:", format)
-	n := reflect.TypeOf(User{})
-	//打印字段MTU的标签
-	for i := 0; i < n.NumField(); i++ {
-		fmt.Println(n.Field(i).Tag)
-	}
+	//n := reflect.TypeOf(User{})
+	//for i := 0; i < n.NumField(); i++ {
+	//	fmt.Println(n.Field(i).Tag)
+	//}
 }
