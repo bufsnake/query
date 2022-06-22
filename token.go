@@ -1,10 +1,10 @@
 package query
 
-type Token struct {
+type tokenChain struct {
 	Type  string
 	Value string
 }
 
-func NewToken(t, v string) *Token {
-	return &Token{t, v}
+func newToken(t, v string) *tokenChain {
+	return &tokenChain{t, v}
 }

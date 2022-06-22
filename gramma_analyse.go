@@ -5,10 +5,10 @@ import (
 )
 
 type tokenBuffer struct {
-	tokens []*Token
+	tokens []*tokenChain
 }
 
-func newTokenBuffer(tokens []*Token) *tokenBuffer {
+func newTokenBuffer(tokens []*tokenChain) *tokenBuffer {
 	return &tokenBuffer{tokens: tokens}
 }
 
@@ -16,43 +16,43 @@ func newTokenBuffer(tokens []*Token) *tokenBuffer {
 // 解析词法分析得到的Token，判断Token所期望的值
 // 进行语法分析，判断语法是否正确
 func (t *tokenBuffer) grammaAnalyse() error {
-	stack_ := NewStack()
+	stack_ := newStack()
 	for i := 0; i < len(t.tokens); i++ {
 		expectToken := make([]string, 0)
 		switch t.tokens[i].Type {
-		case TokenTypeLeftParenthesis:
-			expectToken = []string{TokenTypeLeftParenthesis, TokenTypeRightParenthesis, TokenTypeString}
-			expectToken = append(expectToken, UserKeyword...)
-			stack_.PUSH(TokenTypeLeftParenthesis)
+		case tokenTypeLeftParenthesis:
+			expectToken = []string{tokenTypeLeftParenthesis, tokenTypeRightParenthesis, tokenTypeString}
+			expectToken = append(expectToken, userKeyword...)
+			stack_.PUSH(tokenTypeLeftParenthesis)
 			break
-		case TokenTypeRightParenthesis:
-			expectToken = []string{TokenTypeRightParenthesis, TokenTypeAND, TokenTypeOR, TokenTypeString, TokenTypeEnd}
+		case tokenTypeRightParenthesis:
+			expectToken = []string{tokenTypeRightParenthesis, tokenTypeAND, tokenTypeOR, tokenTypeString, tokenTypeEnd}
 			_, err := stack_.POP()
 			if err != nil {
-				return fmt.Errorf("not properly closed %s", TokenTypeRightParenthesis)
+				return fmt.Errorf("not properly closed %s", tokenTypeRightParenthesis)
 			}
 			break
-		case TokenTypeEquals, TokenTypeStrongEquals, TokenTypeNotEquals, TokenTypeRegexpEquals, TokenTypeRegexpNotEquals:
-			expectToken = []string{TokenTypeString}
+		case tokenTypeEquals, tokenTypeStrongEquals, tokenTypeNotEquals, tokenTypeRegexpEquals, tokenTypeRegexpNotEquals:
+			expectToken = []string{tokenTypeString}
 			break
-		case TokenTypeAND, TokenTypeOR:
-			expectToken = []string{TokenTypeLeftParenthesis, TokenTypeString}
-			expectToken = append(expectToken, UserKeyword...)
+		case tokenTypeAND, tokenTypeOR:
+			expectToken = []string{tokenTypeLeftParenthesis, tokenTypeString}
+			expectToken = append(expectToken, userKeyword...)
 			break
-		case TokenTypeString:
-			expectToken = []string{TokenTypeRightParenthesis, TokenTypeAND, TokenTypeOR, TokenTypeEnd}
+		case tokenTypeString:
+			expectToken = []string{tokenTypeRightParenthesis, tokenTypeAND, tokenTypeOR, tokenTypeEnd}
 			break
-		case TokenTypeStart:
-			expectToken = []string{TokenTypeLeftParenthesis, TokenTypeRightParenthesis, TokenTypeString}
-			expectToken = append(expectToken, UserKeyword...)
+		case tokenTypeStart:
+			expectToken = []string{tokenTypeLeftParenthesis, tokenTypeRightParenthesis, tokenTypeString}
+			expectToken = append(expectToken, userKeyword...)
 			break
-		case TokenTypeEnd:
+		case tokenTypeEnd:
 			goto end
 		default:
-			if !isUserKeyword(t.tokens[i].Type) {
+			if !isuserKeyword(t.tokens[i].Type) {
 				return fmt.Errorf("unknown token type %s", t.tokens[i].Type)
 			}
-			expectToken = []string{TokenTypeEquals, TokenTypeStrongEquals, TokenTypeNotEquals, TokenTypeRegexpEquals, TokenTypeRegexpNotEquals}
+			expectToken = []string{tokenTypeEquals, tokenTypeStrongEquals, tokenTypeNotEquals, tokenTypeRegexpEquals, tokenTypeRegexpNotEquals}
 			break
 		}
 		err := t.checkToken(i, expectToken)

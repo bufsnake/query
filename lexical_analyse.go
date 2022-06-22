@@ -39,69 +39,69 @@ func (sb *inputbuffer) deleteSpace() {
 
 // 内置关键字
 const (
-	TokenTypeLeftParenthesis  = "("     // (
-	TokenTypeRightParenthesis = ")"     // )
-	TokenTypeEquals           = "="     // LIKE ?
-	TokenTypeStrongEquals     = "=="    // =
-	TokenTypeNotEquals        = "!="    // NOT LIKE ?
-	TokenTypeRegexpEquals     = "~="    // REGEXP
-	TokenTypeRegexpNotEquals  = "!~="   // NOT REGEXP ?
-	TokenTypeAND              = "&&"    // AND
-	TokenTypeAND1             = "and"   // AND
-	TokenTypeOR               = "||"    // OR
-	TokenTypeOR1              = "or"    // OR
-	TokenTypeError            = "error" // 语法错误时，显示对应内容
-	TokenTypeStart            = "start" // Token开始
-	TokenTypeEnd              = "end"   // Token结束
-	TokenTypeString           = `"`     // "
-	TokenTypeSpace            = " "     // 空格
+	tokenTypeLeftParenthesis  = "("     // (
+	tokenTypeRightParenthesis = ")"     // )
+	tokenTypeEquals           = "="     // LIKE ?
+	tokenTypeStrongEquals     = "=="    // =
+	tokenTypeNotEquals        = "!="    // NOT LIKE ?
+	tokenTypeRegexpEquals     = "~="    // REGEXP
+	tokenTypeRegexpNotEquals  = "!~="   // NOT REGEXP ?
+	tokenTypeAND              = "&&"    // AND
+	tokenTypeAND1             = "and"   // AND
+	tokenTypeOR               = "||"    // OR
+	tokenTypeOR1              = "or"    // OR
+	tokenTypeError            = "error" // 语法错误时，显示对应内容
+	tokenTypeStart            = "start" // Token开始
+	tokenTypeEnd              = "end"   // Token结束
+	tokenTypeString           = `"`     // "
+	tokenTypeSpace            = " "     // 空格
 )
 
 // 内置关键字
-var Keywords = []string{
-	TokenTypeLeftParenthesis,  // (
-	TokenTypeRightParenthesis, // )
-	TokenTypeEquals,           // =
-	TokenTypeStrongEquals,     // ==
-	TokenTypeNotEquals,        // !=
-	TokenTypeRegexpEquals,     // ~=
-	TokenTypeRegexpNotEquals,  // !~=
-	TokenTypeAND,              // and
-	TokenTypeAND1,             // &&
-	TokenTypeOR,               // or
-	TokenTypeOR1,              // ||
+var systemKeywords = []string{
+	tokenTypeLeftParenthesis,  // (
+	tokenTypeRightParenthesis, // )
+	tokenTypeEquals,           // =
+	tokenTypeStrongEquals,     // ==
+	tokenTypeNotEquals,        // !=
+	tokenTypeRegexpEquals,     // ~=
+	tokenTypeRegexpNotEquals,  // !~=
+	tokenTypeAND,              // and
+	tokenTypeAND1,             // &&
+	tokenTypeOR,               // or
+	tokenTypeOR1,              // ||
 }
 
 // 用户输入关键字
-var UserKeyword = []string{}
+var userKeyword = []string{}
 
 // REF: https://segmentfault.com/a/1190000010998941
 // 词法分析
 // 逐字符读取，判断期望值
-func (sb *inputbuffer) lexicalAnalyse(first bool) *Token {
+func (sb *inputbuffer) lexicalAnalyse(first bool) *tokenChain {
 	_, end := sb.next()
 	if end {
-		return NewToken(TokenTypeEnd, "end")
+		return newToken(tokenTypeEnd, "end")
 	}
 	sb.reduce()
 	// 如果是Token中的字段，则返回Token
-	for i := 0; i < len(Keywords); i++ {
-		data_keyword := string(sb.input[sb.index : sb.index+min(len(Keywords[i]), len(sb.input[sb.index:]))])
-		if strings.ToLower(Keywords[i]) != strings.ToLower(data_keyword) {
+	for i := 0; i < len(systemKeywords); i++ {
+		data_keyword := string(sb.input[sb.index : sb.index+min(len(systemKeywords[i]), len(sb.input[sb.index:]))])
+		if strings.ToLower(systemKeywords[i]) != strings.ToLower(data_keyword) {
 			continue
 		}
-		sb.index += len(Keywords[i])
+		sb.index += len(systemKeywords[i])
 		sb.deleteSpace()
-		keyword := strings.ToLower(Keywords[i])
+		keyword := systemKeywords[i]
 		switch data_keyword {
-		case TokenTypeOR1:
-			keyword = TokenTypeOR
-			data_keyword = TokenTypeOR
-		case TokenTypeAND1:
-			keyword = TokenTypeAND
-			data_keyword = TokenTypeAND
+		case tokenTypeOR1:
+			keyword = tokenTypeOR
+			data_keyword = tokenTypeOR
+		case tokenTypeAND1:
+			keyword = tokenTypeAND
+			data_keyword = tokenTypeAND
 		}
-		return NewToken(keyword, data_keyword)
+		return newToken(keyword, keyword)
 	}
 	// 对于 " 处理
 	next, _ := sb.next()
@@ -113,9 +113,9 @@ func (sb *inputbuffer) lexicalAnalyse(first bool) *Token {
 			n, e := sb.next()
 			if e {
 				if len(string_data) == 0 {
-					return NewToken(TokenTypeError, "\" expect \", not end")
+					return newToken(tokenTypeError, "\" expect \", not end")
 				} else if string(string_data[len(string_data)-1]) != "\"" {
-					return NewToken(TokenTypeError, "\" expect \", not end")
+					return newToken(tokenTypeError, "\" expect \", not end")
 				}
 				break
 			}
@@ -127,10 +127,10 @@ func (sb *inputbuffer) lexicalAnalyse(first bool) *Token {
 		var strdata string
 		err := json.Unmarshal([]byte(string_data), &strdata)
 		if err != nil {
-			return NewToken(TokenTypeError, string_data+" string format error")
+			return newToken(tokenTypeError, string_data+" string format error")
 		}
 		sb.deleteSpace()
-		return NewToken(TokenTypeString, strdata) // 读取字符串 返回Token 期望值: (、)、空格
+		return newToken(tokenTypeString, strdata) // 读取字符串 返回Token 期望值: (、)、空格
 	default:
 		if !first {
 			break
@@ -141,13 +141,13 @@ func (sb *inputbuffer) lexicalAnalyse(first bool) *Token {
 		// IsDomain(data) => domain="data"
 		// ...
 		// 默认为字符串
-		expectToken := []string{TokenTypeOR, TokenTypeAND, TokenTypeSpace}
+		expectToken := []string{tokenTypeOR, tokenTypeAND, tokenTypeSpace}
 		string_data := next
 		token := ""
 		for {
 			n, e := sb.next()
 			if e {
-				token = TokenTypeEnd
+				token = tokenTypeEnd
 				break
 			}
 			sb.reduce()
@@ -158,27 +158,27 @@ func (sb *inputbuffer) lexicalAnalyse(first bool) *Token {
 					break
 				}
 			}
-			if token == TokenTypeOR {
+			if token == tokenTypeOR {
 				break
 			}
-			if token == TokenTypeAND {
+			if token == tokenTypeAND {
 				break
 			}
-			if token == TokenTypeSpace {
+			if token == tokenTypeSpace {
 				break
 			}
 			n, _ = sb.next()
 			string_data += n
 		}
 		sb.deleteSpace()
-		return NewToken(TokenTypeString, string_data)
+		return newToken(tokenTypeString, string_data)
 	}
-	return NewToken(TokenTypeError, "error in "+string(sb.input[sb.index:]))
+	return newToken(tokenTypeError, "error in "+string(sb.input[sb.index:]))
 }
 
-func isUserKeyword(token string) bool {
-	for i := 0; i < len(UserKeyword); i++ {
-		if UserKeyword[i] == token {
+func isuserKeyword(token string) bool {
+	for i := 0; i < len(userKeyword); i++ {
+		if userKeyword[i] == token {
 			return true
 		}
 	}

@@ -15,6 +15,7 @@ type User struct {
 func main() {
 	err := query.AddKeywords([]string{
 		"ip", "ipx", "port", "protocol", "url", "location", "title",
+		"Host",
 	})
 	if err != nil {
 		log.Fatalln(err)
@@ -25,6 +26,7 @@ func main() {
 	sql, params, format, err = query.AnalyseQuery(`127.0.0.1 ||ip="127.0.0.1"`)
 	sql, params, format, err = query.AnalyseQuery(`127.0.0.1||ip="127.0.0.1"`)
 	sql, params, format, err = query.AnalyseQuery(`ip="127.0.0.1"||127.0.0.1 || 1234`)
+	sql, params, format, err = query.AnalyseQuery(`IP="127.0.0.1"||127.0.0.1 || 1234 || HOST=1`)
 	if err != nil {
 		log.Fatalln(err)
 	}

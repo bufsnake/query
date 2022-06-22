@@ -11,7 +11,7 @@ func min(a, b int) int {
 	return a
 }
 
-func InArr(arr []string, data string) bool {
+func inArr(arr []string, data string) bool {
 	for i := 0; i < len(arr); i++ {
 		if strings.ToLower(arr[i]) == data {
 			return true

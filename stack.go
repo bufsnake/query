@@ -9,7 +9,7 @@ type stack struct {
 	stack []string
 }
 
-func NewStack() *stack {
+func newStack() *stack {
 	s := make([]string, 0)
 	return &stack{stack: s}
 }
@@ -19,19 +19,19 @@ func (s *stack) POP() (string, error) {
 		return "", errors.New("grammatical error")
 	}
 	value := s.stack[len(s.stack)-1]
-	newStack := make([]string, 0)
+	ns := make([]string, 0)
 	for i := 0; i < len(s.stack)-1; i++ {
-		newStack = append(newStack, s.stack[i])
+		ns = append(ns, s.stack[i])
 	}
-	s.stack = newStack
+	s.stack = ns
 	return value, nil
 }
 
 func (s *stack) PUSH(value string) {
-	newStack := make([]string, 0)
-	newStack = append(newStack, s.stack...)
-	newStack = append(newStack, value)
-	s.stack = newStack
+	ns := make([]string, 0)
+	ns = append(ns, s.stack...)
+	ns = append(ns, value)
+	s.stack = ns
 }
 
 func (s *stack) isEmpty() bool {
