@@ -20,19 +20,26 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	sql, params, format, err := query.AnalyseQuery(`ipx ="127.0.0.1"|| ip="192.168.1.1"orip="1.1.1.1"`)
-	sql, params, format, err = query.AnalyseQuery(`ip="127.0.0.1"`)
-	sql, params, format, err = query.AnalyseQuery(`protocol=="https" && "127.0.0.1" and ip="1" and (title = "1"|| title="2")`)
-	sql, params, format, err = query.AnalyseQuery(`127.0.0.1 ||ip="127.0.0.1"`)
-	sql, params, format, err = query.AnalyseQuery(`127.0.0.1||ip="127.0.0.1"`)
-	sql, params, format, err = query.AnalyseQuery(`ip="127.0.0.1"||127.0.0.1 || 1234`)
-	sql, params, format, err = query.AnalyseQuery(`IP="127.0.0.1"||127.0.0.1 || 1234 || HOST=1`)
-	if err != nil {
-		log.Fatalln(err)
+	for _, q := range []string{
+		`ipx ="127.0.0.1"|| ip="192.168.1.1"orip="1.1.1.1"`,
+		`ip="127.0.0.1"`,
+		`protocol=="https" && "127.0.0.1" and ip="1" and (title = "1"|| title="2")`,
+		`127.0.0.1 ||ip="127.0.0.1"`,
+		`127.0.0.1||ip="127.0.0.1"`,
+		`ip="127.0.0.1"||127.0.0.1 || 1234`,
+		`IP="127.0.0.1"||127.0.0.1 || 1234 || HOST=1`,
+		`IP="127.0.0.1"||`,
+	} {
+		sql, params, format, err := query.AnalyseQuery(q)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		fmt.Println(" INPUT:", q)
+		fmt.Println("FORMAT:", format)
+		fmt.Println("   SQL:", sql)
+		fmt.Println("PARAMS:", params)
 	}
-	fmt.Println("   SQL:", sql)
-	fmt.Println("PARAMS:", params)
-	fmt.Println("FORMAT:", format)
 	//n := reflect.TypeOf(User{})
 	//for i := 0; i < n.NumField(); i++ {
 	//	fmt.Println(n.Field(i).Tag)

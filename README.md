@@ -35,10 +35,8 @@ or ||  # 或
 ## TEST
 
 ```bash
-input: protocol=="https" && "127.0.0.1" and ip="1" and (title = "1"|| title="2")
-
-output:
-   SQL: `protocol` = ? AND (`ip` LIKE ? OR `ipx` LIKE ? OR `port` LIKE ? OR `protocol` LIKE ? OR `url` LIKE ? OR `location` LIKE ? OR `title` LIKE ?) AND `ip` LIKE ? AND (`title` LIKE ? OR `title` LIKE ?)
-PARAMS: [https %127.0.0.1% %127.0.0.1% %127.0.0.1% %127.0.0.1% %127.0.0.1% %127.0.0.1% %127.0.0.1% %1% %1% %2%]
-FORMAT: protocol=="https" && "127.0.0.1" && ip="1" && (title="1" || title="2")
+ INPUT: IP="127.0.0.1"||127.0.0.1 || 1234 || HOST=1
+FORMAT: ip="127.0.0.1" || "127.0.0.1" || "1234" || Host="1"
+   SQL: `ip` LIKE ? OR (`ip` LIKE ? OR `ipx` LIKE ? OR `port` LIKE ? OR `protocol` LIKE ? OR `url` LIKE ? OR `location` LIKE ? OR `title` LIKE ? OR `Host` LIKE ?) OR (`ip` LIKE ? OR `ipx` LIKE ? OR `port` LIKE ? OR `protocol` LIKE ? OR `url` LIKE ? OR `location` LIKE ? OR `title` LIKE ? OR `Host` LIKE ?) OR `Host` LIKE ?
+PARAMS: [%127.0.0.1% %127.0.0.1% %127.0.0.1% %127.0.0.1% %127.0.0.1% %127.0.0.1% %127.0.0.1% %127.0.0.1% %127.0.0.1% %1234% %1234% %1234% %1234% %1234% %1234% %1234% %1234% %1%]
 ```
