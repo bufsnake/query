@@ -28,7 +28,9 @@ func main() {
 		`127.0.0.1||ip="127.0.0.1"`,
 		`ip="127.0.0.1"||127.0.0.1 || 1234`,
 		`IP="127.0.0.1"||127.0.0.1 || 1234 || HOST=1`,
-		`IP="127.0.0.1"||`,
+		`title="href=\""`,
+		`title=1423\"4213`,
+		`title=1423\\"4213`,
 	} {
 		sql, params, format, err := query.AnalyseQuery(q)
 		if err != nil {

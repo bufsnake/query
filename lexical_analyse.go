@@ -1,7 +1,7 @@
 package query
 
 import (
-	"encoding/json"
+	"fmt"
 	"strings"
 )
 
@@ -108,7 +108,7 @@ func (sb *inputbuffer) lexicalAnalyse(first bool) *tokenChain {
 	switch next {
 	case `"`:
 		// 开始读取字符串 直到遇到另外一个"
-		string_data := `"`
+		string_data := ``
 		for {
 			n, e := sb.next()
 			if e {
@@ -119,18 +119,22 @@ func (sb *inputbuffer) lexicalAnalyse(first bool) *tokenChain {
 				}
 				break
 			}
-			string_data += n
+			if n == "\\" {
+				n, e = sb.next()
+				if e {
+					return newToken(tokenTypeError, "\\ expect character to be escaped, not end")
+				}
+				string_data += n
+				continue
+			}
 			if n == `"` {
 				break
 			}
-		}
-		var strdata string
-		err := json.Unmarshal([]byte(string_data), &strdata)
-		if err != nil {
-			return newToken(tokenTypeError, string_data+" string format error")
+			string_data += n
 		}
 		sb.deleteSpace()
-		return newToken(tokenTypeString, strdata) // 读取字符串 返回Token 期望值: (、)、空格
+		fmt.Println(string_data)
+		return newToken(tokenTypeString, string_data) // 读取字符串 返回Token 期望值: (、)、空格
 	default:
 		if !first {
 			break
@@ -149,6 +153,14 @@ func (sb *inputbuffer) lexicalAnalyse(first bool) *tokenChain {
 			if e {
 				token = tokenTypeEnd
 				break
+			}
+			if n == "\\" {
+				n, e = sb.next()
+				if e {
+					return newToken(tokenTypeError, "\\ expect character to be escaped, not end")
+				}
+				string_data += n
+				continue
 			}
 			sb.reduce()
 			for i := 0; i < len(expectToken); i++ {
