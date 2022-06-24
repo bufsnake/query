@@ -14,7 +14,7 @@ func AnalyseQuery(input string) (sql string, params []interface{}, query_format 
 	tokens = append(tokens, newToken(tokenTypeStart, "start"))
 	buffer := inputbuffer{input: []rune(input), index: 0}
 	for {
-		token := buffer.lexicalAnalyse(true)
+		token := buffer.lexicalAnalyse()
 		if err != nil {
 			return "", nil, "", err
 		}

@@ -1,7 +1,6 @@
 package query
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -78,7 +77,7 @@ var userKeyword = []string{}
 // REF: https://segmentfault.com/a/1190000010998941
 // 词法分析
 // 逐字符读取，判断期望值
-func (sb *inputbuffer) lexicalAnalyse(first bool) *tokenChain {
+func (sb *inputbuffer) lexicalAnalyse() *tokenChain {
 	_, end := sb.next()
 	if end {
 		return newToken(tokenTypeEnd, "end")
@@ -133,12 +132,8 @@ func (sb *inputbuffer) lexicalAnalyse(first bool) *tokenChain {
 			string_data += n
 		}
 		sb.deleteSpace()
-		fmt.Println(string_data)
 		return newToken(tokenTypeString, string_data) // 读取字符串 返回Token 期望值: (、)、空格
 	default:
-		if !first {
-			break
-		}
 		// 以字符串的形式处理，直到遇到 空格/END/OR/AND
 		// 对于此情况得到的数据，可以由用户自定义函数对其进行数据识别
 		// IsIP(data) => ip="data"
