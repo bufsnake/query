@@ -65,4 +65,11 @@ func test_bleve() {
 	fmt.Println("FORMAT:", format)
 	marshal, _ = json.Marshal(req)
 	fmt.Println(string(marshal))
+	req, format, err = query.NewQuery(`ip*="1"`).GetBleveQuery()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Println("FORMAT:", format)
+	marshal, _ = json.Marshal(req)
+	fmt.Println(string(marshal))
 }

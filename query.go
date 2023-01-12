@@ -267,7 +267,7 @@ func (q *Query) bleveSearchRequest() *bleve.SearchRequest {
 	//	fmt.Print(chains[i].Type, " ")
 	//}
 	//fmt.Println()
-	return bleve.NewSearchRequest(q.get_query(chains))
+	return bleve.NewSearchRequest(q.get_query(chains[1 : len(chains)-1]))
 }
 
 func (q *Query) get_query(chains []*tokenChain) query.Query {
