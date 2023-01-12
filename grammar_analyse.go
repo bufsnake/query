@@ -15,24 +15,24 @@ func newTokenBuffer(tokens []*tokenChain) *tokenBuffer {
 // 语法分析
 // 解析词法分析得到的Token，判断Token所期望的值
 // 进行语法分析，判断语法是否正确
-func (t *tokenBuffer) grammaAnalyse() error {
-	stack_ := newStack()
+func (t *tokenBuffer) grammarAnalyse() error {
+	stack_ := NewStack()
 	for i := 0; i < len(t.tokens); i++ {
 		expectToken := make([]string, 0)
 		switch t.tokens[i].Type {
 		case tokenTypeLeftParenthesis:
 			expectToken = []string{tokenTypeLeftParenthesis, tokenTypeRightParenthesis, tokenTypeString}
 			expectToken = append(expectToken, userKeyword...)
-			stack_.PUSH(tokenTypeLeftParenthesis)
+			stack_.Push(tokenTypeLeftParenthesis)
 			break
 		case tokenTypeRightParenthesis:
 			expectToken = []string{tokenTypeRightParenthesis, tokenTypeAND, tokenTypeOR, tokenTypeString, tokenTypeEnd}
-			_, err := stack_.POP()
+			_, err := stack_.Pop()
 			if err != nil {
 				return fmt.Errorf("not properly closed %s", tokenTypeRightParenthesis)
 			}
 			break
-		case tokenTypeEquals, tokenTypeStrongEquals, tokenTypeNotEquals, tokenTypeRegexpEquals, tokenTypeRegexpNotEquals:
+		case tokenTypeEquals, tokenTypeStrongEquals, tokenTypeNotEquals, tokenTypeRegexpEquals, tokenTypeRegexpNotEquals, tokenTypeWildcardEquals, tokenTypeWildcardNotEquals:
 			expectToken = []string{tokenTypeString}
 			break
 		case tokenTypeAND, tokenTypeOR:
@@ -52,7 +52,7 @@ func (t *tokenBuffer) grammaAnalyse() error {
 			if !isuserKeyword(t.tokens[i].Type) {
 				return fmt.Errorf("unknown token type %s", t.tokens[i].Type)
 			}
-			expectToken = []string{tokenTypeEquals, tokenTypeStrongEquals, tokenTypeNotEquals, tokenTypeRegexpEquals, tokenTypeRegexpNotEquals}
+			expectToken = []string{tokenTypeEquals, tokenTypeStrongEquals, tokenTypeNotEquals, tokenTypeRegexpEquals, tokenTypeRegexpNotEquals, tokenTypeWildcardEquals, tokenTypeWildcardNotEquals}
 			break
 		}
 		err := t.checkToken(i, expectToken)
@@ -64,7 +64,7 @@ end:
 	if stack_.isEmpty() {
 		return nil
 	}
-	closure, _ := stack_.POP()
+	closure, _ := stack_.Pop()
 	return fmt.Errorf("not properly closed %s", closure)
 }
 

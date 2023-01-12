@@ -36,44 +36,6 @@ func (sb *inputbuffer) deleteSpace() {
 	}
 }
 
-// 内置关键字
-const (
-	tokenTypeLeftParenthesis  = "("     // (
-	tokenTypeRightParenthesis = ")"     // )
-	tokenTypeEquals           = "="     // LIKE ?
-	tokenTypeStrongEquals     = "=="    // =
-	tokenTypeNotEquals        = "!="    // NOT LIKE ?
-	tokenTypeRegexpEquals     = "~="    // REGEXP
-	tokenTypeRegexpNotEquals  = "!~="   // NOT REGEXP ?
-	tokenTypeAND              = "&&"    // AND
-	tokenTypeAND1             = "and"   // AND
-	tokenTypeOR               = "||"    // OR
-	tokenTypeOR1              = "or"    // OR
-	tokenTypeError            = "error" // 语法错误时，显示对应内容
-	tokenTypeStart            = "start" // Token开始
-	tokenTypeEnd              = "end"   // Token结束
-	tokenTypeString           = `"`     // "
-	tokenTypeSpace            = " "     // 空格
-)
-
-// 内置关键字
-var systemKeywords = []string{
-	tokenTypeLeftParenthesis,  // (
-	tokenTypeRightParenthesis, // )
-	tokenTypeEquals,           // =
-	tokenTypeStrongEquals,     // ==
-	tokenTypeNotEquals,        // !=
-	tokenTypeRegexpEquals,     // ~=
-	tokenTypeRegexpNotEquals,  // !~=
-	tokenTypeAND,              // and
-	tokenTypeAND1,             // &&
-	tokenTypeOR,               // or
-	tokenTypeOR1,              // ||
-}
-
-// 用户输入关键字
-var userKeyword = []string{}
-
 // REF: https://segmentfault.com/a/1190000010998941
 // 词法分析
 // 逐字符读取，判断期望值

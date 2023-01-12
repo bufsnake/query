@@ -5,16 +5,16 @@ import (
 )
 
 // 栈
-type stack struct {
+type Stack struct {
 	stack []string
 }
 
-func newStack() *stack {
+func NewStack() *Stack {
 	s := make([]string, 0)
-	return &stack{stack: s}
+	return &Stack{stack: s}
 }
 
-func (s *stack) POP() (string, error) {
+func (s *Stack) Pop() (string, error) {
 	if s.isEmpty() {
 		return "", errors.New("grammatical error")
 	}
@@ -27,14 +27,14 @@ func (s *stack) POP() (string, error) {
 	return value, nil
 }
 
-func (s *stack) PUSH(value string) {
+func (s *Stack) Push(value string) {
 	ns := make([]string, 0)
 	ns = append(ns, s.stack...)
 	ns = append(ns, value)
 	s.stack = ns
 }
 
-func (s *stack) isEmpty() bool {
+func (s *Stack) isEmpty() bool {
 	if len(s.stack) == 0 {
 		return true
 	}
