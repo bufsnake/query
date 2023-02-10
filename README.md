@@ -4,7 +4,7 @@
 
 ## TODO
 
-- [ ] 为keyword添加格式检测，如ip="1.1.1.1"(正确), ip="1"(错误)
+- [x] 为keyword添加格式检测，如ip="1.1.1.1"(正确), ip="1"(错误)，具体参考example/main.go
 
 ## 实现
 
@@ -38,178 +38,40 @@ or ||  # 或
 # 参考cmd/example/main.go
 ```
 
-## TEST
+## Example TEST
 
 ### GORM
 
 ```bash
- INPUT: IP="127.0.0.1"||127.0.0.1 || 1234 || HOST=1
-FORMAT: ip="127.0.0.1" || "127.0.0.1" || "1234" || Host="1"
-   SQL: `ip` LIKE ? OR (`ip` LIKE ? OR `ipx` LIKE ? OR `port` LIKE ? OR `protocol` LIKE ? OR `url` LIKE ? OR `location` LIKE ? OR `title` LIKE ? OR `Host` LIKE ?) OR (`ip` LIKE ? OR `ipx` LIKE ? OR `port` LIKE ? OR `protocol` LIKE ? OR `url` LIKE ? OR `location` LIKE ? OR `title` LIKE ? OR `Host` LIKE ?) OR `Host` LIKE ?
-PARAMS: [%127.0.0.1% %127.0.0.1% %127.0.0.1% %127.0.0.1% %127.0.0.1% %127.0.0.1% %127.0.0.1% %127.0.0.1% %127.0.0.1% %1234% %1234% %1234% %1234% %1234% %1234% %1234% %1234% %1%]
+ INPUT: host="baidu.com"
+FORMAT: host="baidu.com"
+   SQL: `host` LIKE ?
+PARAMS: [%baidu.com%]
 ```
 
 ### bleve
 
 ```bash
-FORMAT: (ip="1" || ip="2") && protocol=="https" && "127.0.0.1" && ((title*="1") || title!*="2") && ip="1" && (((title="1" || title="2")) && ip="2" || (ip="1" || ((ip="10") || ip="20") && title="ccccc")) 
+FORMAT: host*="*.baidu.com"
 ```
 
 ```json
 {
-    "query": {
-        "conjuncts": [
-            {
-                "conjuncts": [
-                    {
-                        "conjuncts": [
-                            {
-                                "conjuncts": [
-                                    {
-                                        "conjuncts": [
-                                            {
-                                                "disjuncts": [
-                                                    {
-                                                        "match": "1",
-                                                        "field": "ip",
-                                                        "prefix_length": 0,
-                                                        "fuzziness": 0
-                                                    },
-                                                    {
-                                                        "match": "2",
-                                                        "field": "ip",
-                                                        "prefix_length": 0,
-                                                        "fuzziness": 0
-                                                    }
-                                                ],
-                                                "min": 0
-                                            },
-                                            {
-                                                "term": "https",
-                                                "field": "protocol"
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "match": "127.0.0.1",
-                                        "prefix_length": 0,
-                                        "fuzziness": 0
-                                    }
-                                ]
-                            },
-                            {
-                                "disjuncts": [
-                                    {
-                                        "wildcard": "1",
-                                        "field": "title"
-                                    },
-                                    {
-                                        "must_not": {
-                                            "disjuncts": [
-                                                {
-                                                    "wildcard": "2",
-                                                    "field": "title"
-                                                }
-                                            ],
-                                            "min": 0
-                                        }
-                                    }
-                                ],
-                                "min": 0
-                            }
-                        ]
-                    },
-                    {
-                        "match": "1",
-                        "field": "ip",
-                        "prefix_length": 0,
-                        "fuzziness": 0
-                    }
-                ]
-            },
-            {
-                "disjuncts": [
-                    {
-                        "conjuncts": [
-                            {
-                                "disjuncts": [
-                                    {
-                                        "match": "1",
-                                        "field": "title",
-                                        "prefix_length": 0,
-                                        "fuzziness": 0
-                                    },
-                                    {
-                                        "match": "2",
-                                        "field": "title",
-                                        "prefix_length": 0,
-                                        "fuzziness": 0
-                                    }
-                                ],
-                                "min": 0
-                            },
-                            {
-                                "match": "2",
-                                "field": "ip",
-                                "prefix_length": 0,
-                                "fuzziness": 0
-                            }
-                        ]
-                    },
-                    {
-                        "conjuncts": [
-                            {
-                                "disjuncts": [
-                                    {
-                                        "match": "1",
-                                        "field": "ip",
-                                        "prefix_length": 0,
-                                        "fuzziness": 0
-                                    },
-                                    {
-                                        "disjuncts": [
-                                            {
-                                                "match": "10",
-                                                "field": "ip",
-                                                "prefix_length": 0,
-                                                "fuzziness": 0
-                                            },
-                                            {
-                                                "match": "20",
-                                                "field": "ip",
-                                                "prefix_length": 0,
-                                                "fuzziness": 0
-                                            }
-                                        ],
-                                        "min": 0
-                                    }
-                                ],
-                                "min": 0
-                            },
-                            {
-                                "match": "ccccc",
-                                "field": "title",
-                                "prefix_length": 0,
-                                "fuzziness": 0
-                            }
-                        ]
-                    }
-                ],
-                "min": 0
-            }
-        ]
-    },
-    "size": 10,
-    "from": 0,
-    "highlight": null,
-    "fields": null,
-    "facets": null,
-    "explain": false,
-    "sort": [
-        "-_score"
-    ],
-    "includeLocations": false,
-    "search_after": null,
-    "search_before": null
+  "query": {
+    "wildcard": "moc.udiab.*",
+    "field": "host"
+  },
+  "size": 10,
+  "from": 0,
+  "highlight": null,
+  "fields": null,
+  "facets": null,
+  "explain": false,
+  "sort": [
+    "-_score"
+  ],
+  "includeLocations": false,
+  "search_after": null,
+  "search_before": null
 }
 ```

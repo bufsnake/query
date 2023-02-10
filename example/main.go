@@ -8,10 +8,19 @@ import (
 )
 
 func main() {
-	err := query.AddKeyword("ip", "ipx", "port", "protocol", "url", "location", "title", "Host")
+	err := query.CustomKeywords("host")
 	if err != nil {
 		log.Fatalln(err)
 	}
+	query.CustomKeywordHookFunction(map[string]func(str string) string{
+		"host": func(str string) string {
+			runes := []rune(str)
+			for from, to := 0, len(runes)-1; from < to; from, to = from+1, to-1 {
+				runes[from], runes[to] = runes[to], runes[from]
+			}
+			return string(runes)
+		},
+	})
 	test_bleve()
 	fmt.Println("++++++++++++++++++++++++++++++++")
 	test_gorm()
@@ -19,17 +28,7 @@ func main() {
 
 func test_gorm() {
 	for _, q := range []string{
-		`ipx ="127.0.0.1"|| ip="192.168.1.1"orip="1.1.1.1"`,
-		`ip="127.0.0.1"`,
-		`protocol=="https" && "127.0.0.1" and ip="1" and (title = "1"|| title="2")`,
-		`127.0.0.1 ||ip="127.0.0.1"`,
-		`127.0.0.1||ip="127.0.0.1"`,
-		`ip="127.0.0.1"||127.0.0.1 || 1234`,
-		`IP="127.0.0.1"||127.0.0.1 || 1234 || HOST=1`,
-		`title="href=\""`,
-		`title=1423"4213`,
-		`title=1423\"4213`,
-		`title=1423\\"4213`,
+		`host="baidu.com"`,
 	} {
 		sql, params, format, err := query.NewQuery(q).GetGormQuery()
 		if err != nil {
@@ -44,32 +43,11 @@ func test_gorm() {
 }
 
 func test_bleve() {
-	req, format, err := query.NewQuery(`(ip="1" or ip="2") && protocol=="https" && "127.0.0.1" && ((title*="1") || title!*="2") and ip="1" and (((title = "1"|| title="2")) and ip="2" or (ip="1" || ((ip="10") or ip="20") && title="ccccc"))`).GetBleveQuery()
+	req, format, err := query.NewQuery(`host*="*.baidu.com"`).GetBleveQuery()
 	if err != nil {
 		log.Fatalln(err)
 	}
 	fmt.Println("FORMAT:", format)
 	marshal, _ := json.Marshal(req)
-	fmt.Println(string(marshal))
-	req, format, err = query.NewQuery(`protocol=="https" && "127.0.0.1" && ((title*="1") || title!*="2") and ip="1" and (((title = "1"|| title="2")) and ip="2" or (ip="1" && title="ccccc"))`).GetBleveQuery()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	fmt.Println("FORMAT:", format)
-	marshal, _ = json.Marshal(req)
-	fmt.Println(string(marshal))
-	req, format, err = query.NewQuery(`(((title = "1"|| title="2")) and ip="2" or (ip="1" && title="ccccc"))`).GetBleveQuery()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	fmt.Println("FORMAT:", format)
-	marshal, _ = json.Marshal(req)
-	fmt.Println(string(marshal))
-	req, format, err = query.NewQuery(`ip*="1"`).GetBleveQuery()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	fmt.Println("FORMAT:", format)
-	marshal, _ = json.Marshal(req)
 	fmt.Println(string(marshal))
 }

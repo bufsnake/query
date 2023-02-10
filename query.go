@@ -194,21 +194,33 @@ func (q *Query) bleveSearchRequest() *bleve.SearchRequest {
 		default:
 			switch tokens[i+1].Type {
 			case tokenTypeEquals:
-				query := bleve.NewMatchQuery(tokens[i+2].Value)
+				val := tokens[i+2].Value
+				if _, ok := keywordFuncion[tokens[i].Value]; ok && keywordFuncion[tokens[i].Value] != nil {
+					val = keywordFuncion[tokens[i].Value](val)
+				}
+				query := bleve.NewMatchQuery(val)
 				query.SetField(tokens[i].Value)
 				chains = append(chains, &tokenChain{
 					Type:  tokenTypeQuery,
 					Query: query,
 				})
 			case tokenTypeStrongEquals:
-				query := bleve.NewTermQuery(tokens[i+2].Value)
+				val := tokens[i+2].Value
+				if _, ok := keywordFuncion[tokens[i].Value]; ok && keywordFuncion[tokens[i].Value] != nil {
+					val = keywordFuncion[tokens[i].Value](val)
+				}
+				query := bleve.NewMatchPhraseQuery(val)
 				query.SetField(tokens[i].Value)
 				chains = append(chains, &tokenChain{
 					Type:  tokenTypeQuery,
 					Query: query,
 				})
 			case tokenTypeNotEquals:
-				query := bleve.NewTermQuery(tokens[i+2].Value)
+				val := tokens[i+2].Value
+				if _, ok := keywordFuncion[tokens[i].Value]; ok && keywordFuncion[tokens[i].Value] != nil {
+					val = keywordFuncion[tokens[i].Value](val)
+				}
+				query := bleve.NewMatchPhraseQuery(val)
 				query.SetField(tokens[i].Value)
 				booleanQuery := bleve.NewBooleanQuery()
 				booleanQuery.AddMustNot(query)
@@ -217,14 +229,22 @@ func (q *Query) bleveSearchRequest() *bleve.SearchRequest {
 					Query: booleanQuery,
 				})
 			case tokenTypeRegexpEquals:
-				query := bleve.NewRegexpQuery(tokens[i+2].Value)
+				val := tokens[i+2].Value
+				if _, ok := keywordFuncion[tokens[i].Value]; ok && keywordFuncion[tokens[i].Value] != nil {
+					val = keywordFuncion[tokens[i].Value](val)
+				}
+				query := bleve.NewRegexpQuery(val)
 				query.SetField(tokens[i].Value)
 				chains = append(chains, &tokenChain{
 					Type:  tokenTypeQuery,
 					Query: query,
 				})
 			case tokenTypeRegexpNotEquals:
-				query := bleve.NewRegexpQuery(tokens[i+2].Value)
+				val := tokens[i+2].Value
+				if _, ok := keywordFuncion[tokens[i].Value]; ok && keywordFuncion[tokens[i].Value] != nil {
+					val = keywordFuncion[tokens[i].Value](val)
+				}
+				query := bleve.NewRegexpQuery(val)
 				query.SetField(tokens[i].Value)
 				booleanQuery := bleve.NewBooleanQuery()
 				booleanQuery.AddMustNot(query)
@@ -233,14 +253,22 @@ func (q *Query) bleveSearchRequest() *bleve.SearchRequest {
 					Query: booleanQuery,
 				})
 			case tokenTypeWildcardEquals:
-				query := bleve.NewWildcardQuery(tokens[i+2].Value)
+				val := tokens[i+2].Value
+				if _, ok := keywordFuncion[tokens[i].Value]; ok && keywordFuncion[tokens[i].Value] != nil {
+					val = keywordFuncion[tokens[i].Value](val)
+				}
+				query := bleve.NewWildcardQuery(val)
 				query.SetField(tokens[i].Value)
 				chains = append(chains, &tokenChain{
 					Type:  tokenTypeQuery,
 					Query: query,
 				})
 			case tokenTypeWildcardNotEquals:
-				query := bleve.NewWildcardQuery(tokens[i+2].Value)
+				val := tokens[i+2].Value
+				if _, ok := keywordFuncion[tokens[i].Value]; ok && keywordFuncion[tokens[i].Value] != nil {
+					val = keywordFuncion[tokens[i].Value](val)
+				}
+				query := bleve.NewWildcardQuery(val)
 				query.SetField(tokens[i].Value)
 				booleanQuery := bleve.NewBooleanQuery()
 				booleanQuery.AddMustNot(query)

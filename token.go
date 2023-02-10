@@ -49,8 +49,20 @@ var systemKeywords = []string{
 // 用户输入关键字
 var userKeyword = []string{}
 
+var keywordFuncion = map[string]func(str string) string{}
+
+type tokenChain struct {
+	Type  string
+	Value string
+	Query query.Query
+}
+
+func newToken(t, v string) *tokenChain {
+	return &tokenChain{Type: t, Value: v}
+}
+
 // 添加关键字 -> 按长度进行排序(添加ip和ipx两个关键字，未进行排序，会匹配到ip后就返回token，导致存在一个x字符)
-func AddKeyword(keyword ...string) error {
+func CustomKeywords(keyword ...string) error {
 	for i := 0; i < len(keyword); i++ {
 		if inArr(systemKeywords, keyword[i]) {
 			return fmt.Errorf("%s keyword already exists", keyword[i])
@@ -78,12 +90,12 @@ func AddKeyword(keyword ...string) error {
 	return nil
 }
 
-type tokenChain struct {
-	Type  string
-	Value string
-	Query query.Query
-}
-
-func newToken(t, v string) *tokenChain {
-	return &tokenChain{Type: t, Value: v}
+// 目前仅针对bleve
+func CustomKeywordHookFunction(keyword map[string]func(str string) string) {
+	if keywordFuncion == nil {
+		keywordFuncion = make(map[string]func(str string) string)
+	}
+	for k, f := range keyword {
+		keywordFuncion[k] = f
+	}
 }
