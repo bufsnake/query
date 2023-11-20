@@ -8,28 +8,36 @@ import (
 )
 
 func main() {
+	//err := query.CustomKeywords("host")
+	//if err != nil {
+	//	log.Fatalln(err)
+	//}
+	//query.CustomKeywordHookFunction(map[string]func(str string) string{
+	//	"host": func(str string) string {
+	//		runes := []rune(str)
+	//		for from, to := 0, len(runes)-1; from < to; from, to = from+1, to-1 {
+	//			runes[from], runes[to] = runes[to], runes[from]
+	//		}
+	//		return string(runes)
+	//	},
+	//})
+	
+	//test_bleve()
+	//fmt.Println("++++++++++++++++++++++++++++++++")
 	err := query.CustomKeywords("host")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	query.CustomKeywordHookFunction(map[string]func(str string) string{
-		"host": func(str string) string {
-			runes := []rune(str)
-			for from, to := 0, len(runes)-1; from < to; from, to = from+1, to-1 {
-				runes[from], runes[to] = runes[to], runes[from]
-			}
-			return string(runes)
-		},
-	})
-	test_bleve()
-	fmt.Println("++++++++++++++++++++++++++++++++")
+	test_gorm()
+	err = query.CustomKeywords("hostf")
+	if err != nil {
+		log.Fatalln(err)
+	}
 	test_gorm()
 }
 
 func test_gorm() {
-	for _, q := range []string{
-		`host="baidu.com"`,
-	} {
+	for _, q := range []string{`hostf="baidu.com"`} {
 		sql, params, format, err := query.NewQuery(q).GetGormQuery()
 		if err != nil {
 			log.Println(err)

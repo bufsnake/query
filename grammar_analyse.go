@@ -29,7 +29,7 @@ func (t *tokenBuffer) grammarAnalyse() error {
 			expectToken = []string{tokenTypeRightParenthesis, tokenTypeAND, tokenTypeOR, tokenTypeString, tokenTypeEnd}
 			_, err := stack_.Pop()
 			if err != nil {
-				return fmt.Errorf("not properly closed %s", tokenTypeRightParenthesis)
+				return fmt.Errorf("grammar analyse not properly closed %s", tokenTypeRightParenthesis)
 			}
 			break
 		case tokenTypeEquals, tokenTypeStrongEquals, tokenTypeNotEquals, tokenTypeRegexpEquals, tokenTypeRegexpNotEquals, tokenTypeWildcardEquals, tokenTypeWildcardNotEquals:
@@ -65,7 +65,7 @@ end:
 		return nil
 	}
 	closure, _ := stack_.Pop()
-	return fmt.Errorf("not properly closed %s", closure)
+	return fmt.Errorf("grammar analyse not properly closed %s", closure)
 }
 
 func (t *tokenBuffer) checkToken(index int, exceptTokens []string) error {

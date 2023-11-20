@@ -143,11 +143,15 @@ func (q *Query) gormSqlStatement() (string, []interface{}) {
 				need = false
 			}
 			if need {
-				temp_sql = fmt.Sprintf("(`%s` LIKE ? OR ", userKeyword[0])
-				for u := 1; u < len(userKeyword)-1; u++ {
-					temp_sql += fmt.Sprintf("`%s` LIKE ? OR ", userKeyword[u])
+				if len(userKeyword) == 1 {
+					temp_sql += fmt.Sprintf("(`%s` LIKE ?)", userKeyword[0])
+				} else {
+					temp_sql = fmt.Sprintf("(`%s` LIKE ? OR ", userKeyword[0])
+					for u := 1; u < len(userKeyword)-1; u++ {
+						temp_sql += fmt.Sprintf("`%s` LIKE ? OR ", userKeyword[u])
+					}
+					temp_sql += fmt.Sprintf("`%s` LIKE ?)", userKeyword[len(userKeyword)-1])
 				}
-				temp_sql += fmt.Sprintf("`%s` LIKE ?)", userKeyword[len(userKeyword)-1])
 			}
 			switch tokens[i+1].Type {
 			case tokenTypeRightParenthesis:
@@ -365,7 +369,7 @@ func (q *Query) get_subchains(chains []*tokenChain) ([]*tokenChain, int) {
 		switch chains[i].Type {
 		case tokenTypeLeftParenthesis:
 			subchains = append(subchains, chains[i])
-			stack.Push("")
+			stack.Push(tokenTypeLeftParenthesis)
 		case tokenTypeRightParenthesis:
 			subchains = append(subchains, chains[i])
 			stack.Pop()

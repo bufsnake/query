@@ -30,21 +30,7 @@ const (
 )
 
 // 内置关键字
-var systemKeywords = []string{
-	tokenTypeLeftParenthesis,   // (
-	tokenTypeRightParenthesis,  // )
-	tokenTypeEquals,            // =
-	tokenTypeStrongEquals,      // ==
-	tokenTypeNotEquals,         // !=
-	tokenTypeRegexpEquals,      // ~=
-	tokenTypeRegexpNotEquals,   // !~=
-	tokenTypeWildcardEquals,    // "*="
-	tokenTypeWildcardNotEquals, // "!*="
-	tokenTypeAND,               // and
-	tokenTypeAND1,              // &&
-	tokenTypeOR,                // or
-	tokenTypeOR1,               // ||
-}
+var systemKeywords = []string{}
 
 // 用户输入关键字
 var userKeyword = []string{}
@@ -63,6 +49,23 @@ func newToken(t, v string) *tokenChain {
 
 // 添加关键字 -> 按长度进行排序(添加ip和ipx两个关键字，未进行排序，会匹配到ip后就返回token，导致存在一个x字符)
 func CustomKeywords(keyword ...string) error {
+	systemKeywords = []string{
+		tokenTypeLeftParenthesis,   // (
+		tokenTypeRightParenthesis,  // )
+		tokenTypeEquals,            // =
+		tokenTypeStrongEquals,      // ==
+		tokenTypeNotEquals,         // !=
+		tokenTypeRegexpEquals,      // ~=
+		tokenTypeRegexpNotEquals,   // !~=
+		tokenTypeWildcardEquals,    // "*="
+		tokenTypeWildcardNotEquals, // "!*="
+		tokenTypeAND,               // and
+		tokenTypeAND1,              // &&
+		tokenTypeOR,                // or
+		tokenTypeOR1,               // ||
+	}
+	userKeyword = []string{}
+	
 	for i := 0; i < len(keyword); i++ {
 		if inArr(systemKeywords, keyword[i]) {
 			return fmt.Errorf("%s keyword already exists", keyword[i])
@@ -90,11 +93,9 @@ func CustomKeywords(keyword ...string) error {
 	return nil
 }
 
-// 目前仅针对bleve
+// 目前仅针对bleve - 不同的Index需要重新设置关键字
 func CustomKeywordHookFunction(keyword map[string]func(str string) string) {
-	if keywordFuncion == nil {
-		keywordFuncion = make(map[string]func(str string) string)
-	}
+	keywordFuncion = make(map[string]func(str string) string)
 	for k, f := range keyword {
 		keywordFuncion[k] = f
 	}
