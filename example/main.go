@@ -24,20 +24,20 @@ func main() {
 	
 	//test_bleve()
 	//fmt.Println("++++++++++++++++++++++++++++++++")
-	err := query.CustomKeywords("host")
+	err := query.CustomKeywords("body", "title")
 	if err != nil {
 		log.Fatalln(err)
 	}
 	test_gorm()
-	err = query.CustomKeywords("hostf")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	test_gorm()
+	//err = query.CustomKeywords("hostf")
+	//if err != nil {
+	//	log.Fatalln(err)
+	//}
+	//test_gorm()
 }
 
 func test_gorm() {
-	for _, q := range []string{`hostf="baidu.com"`} {
+	for _, q := range []string{`body=src=\"/qysoss/assets/js`, `body="chanzhi.js" || (body="poweredBy'>!#@#$%^&**()<a href='http://www.chanzhi.org" && title="2121")`} {
 		sql, params, format, err := query.NewQuery(q).GetGormQuery()
 		if err != nil {
 			log.Println(err)
